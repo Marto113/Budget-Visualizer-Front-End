@@ -10,20 +10,23 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import authApi from '../services/authApi';
+import AuthApi from '../services/authApi';
+import { useNavigate } from 'react-router-dom';
 
 const theme = createTheme();
 
-const Login = ({ authApi }: { authApi: authApi }) => {
+const Login = ({ authApi }: { authApi: typeof AuthApi }) => {
  const [username, setUsername] = useState('');
  const [password, setPassword] = useState('');
+ const navigate = useNavigate();
 
  const handleSubmit = async (event: React.FormEvent) => {
   event.preventDefault();
   try {
-    const token = await authApi.login(username, password);
-    console.log('Successfully logged in:', token);
-    
+    const id = await authApi.login(username, password);
+    console.log('Successfully logged in:', id);
+    console.log(id);
+    navigate(`/dashboard/${id}`);
 
   } catch (error) {
     console.error('Failed to log in:', error);

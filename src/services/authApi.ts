@@ -1,78 +1,110 @@
 import axios from 'axios';
 
-class authApi {
- private baseUrl = 'http://localhost:5000';
+interface AuthApiInterface {
+  getAccessToken(): string | null;
+  isTokenExpired(token: string): Promise<boolean>;
+  refreshToken(): Promise<void>;
+}
 
-async login(username: string, password: string) {
-  try {
+class AuthApi implements AuthApiInterface {
+  private baseUrl = 'http://localhost:5000';
+
+  async login(username: string, password: string): Promise<string> {
+    try {
       const response = await axios.post(`${this.baseUrl}/auth/login`, {
         username,
         password,
       });
 
       if (response.status === 200) {
-        const token = response.data.token;
-        console.log(response);
+        const id = response.data.userId;
         setTokenCookies(response.data.accessToken, response.data.refreshToken);
-        return token;
+        return id;
       }
     } catch (error) {
       console.error('Failed to log in:', error);
       throw error;
     }
+
+    return '';
   }
-}
 
-async function refreshToken() {
-  const refreshTokenCookie = document.cookie.split(';').map(cookie => cookie.trim())
-    .find(cookie => cookie.startsWith('refreshToken='));
+  getAccessToken(): string | null {
+    return getCookie('accessToken');
+  }
 
-  if (refreshTokenCookie) {
-    const refreshToken = refreshTokenCookie.split('=')[1];
-
-    if (refreshToken) {
-      try {
-        // Make a request to your server's /refresh-token endpoint using Axios
-        const response = await axios.post('/refresh-token', {
-          refreshToken,
-        }, {
-          withCredentials: true, // Include cookies in the request
-        });
-
-        // Check if the response status is OK (2xx)
-        if (response.status === 200) {
-          // If the request was successful, get the new access token
-          const newAccessToken = response.data;
-
-          // Store the new access token in a cookie or wherever it's managed
-          document.cookie = `accessToken=${newAccessToken.accessToken}; max-age=${60 * 15}; path=/`; // 15 minutes
-
-          // Continue with the application logic using the new access token
-        } else {
-          // Handle non-OK response from the server
-          console.error('Error refreshing token:', response.statusText);
-          // Redirect to login page
-          window.location.href = '/login';
-        }
-      } catch (error: any) {
-        console.error('Error refreshing token:', error.message);
-        // Redirect to login page
-        window.location.href = '/login';
+  async isTokenExpired(token: string): Promise<boolean> {
+    try {
+      const decodedToken = decodeToken(token);
+  
+      if (!decodedToken || typeof decodedToken.exp !== 'number') {
+        return true;
       }
-    } else {
-      // Handle the case where refreshToken is undefined
-      console.error('Refresh token is undefined');
-      // Redirect to login page or handle accordingly
-      window.location.href = '/login';
+  
+      const currentTime = Math.floor(Date.now() / 1000);
+      return decodedToken.exp < currentTime;
+    } catch (error) {
+      console.error('Error checking token expiration:', error);
+      return true;
     }
-  } else {
-    // No refresh token available, redirect to login
-    window.location.href = '/login';
+  }
+
+  async refreshToken(): Promise<void> {
+    try {
+      const refreshToken = getCookie('refreshToken');
+
+      if (!refreshToken) {
+        throw new Error('No refresh token available');
+      }
+
+      const response = await axios.post(`${this.baseUrl}/auth/refresh`, {
+        refresh_token: refreshToken,
+      });
+
+      if (response.status === 200) {
+        setTokenCookies(response.data.accessToken, response.data.refreshToken);
+      }
+    } catch (error) {
+      console.error('Error refreshing token:', error);
+      throw error;
+    }
+  }
+
+  decodeToken(token: string): Record<string, unknown> | null {
+    try {
+      const decoded = JSON.parse(atob(token.split('.')[1]));
+      return decoded;
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return null;
+    }
   }
 }
+
 function setTokenCookies(accessToken: string, refreshToken: string) {
-  document.cookie = `accessToken=${accessToken}; max-age=${60 * 15}; path=/`; // 15 minutes
-  document.cookie = `refreshToken=${refreshToken}; max-age=${60 * 60 * 24 * 7}; path=/`; // 7 days
+  document.cookie = `accessToken=${accessToken}; max-age=${60 * 15}; path=/`;
+  document.cookie = `refreshToken=${refreshToken}; max-age=${60 * 60 * 24 * 7}; path=/`;
 }
 
-export default authApi;
+const getCookie = (name: string): string | null => {
+  const cookies = document.cookie.split(';');
+  for (const cookie of cookies) {
+    const [cookieName, cookieValue] = cookie.trim().split('=');
+    if (cookieName === name) {
+      return cookieValue;
+    }
+  }
+  return null;
+}
+
+const decodeToken = (token: string): Record<string, unknown> | null => {
+  try {
+    const decoded = JSON.parse(atob(token.split('.')[1]));
+    return decoded;
+  } catch (error) {
+    console.error('Error decoding token:', error);
+    return null;
+  }
+};
+
+export default new AuthApi();
