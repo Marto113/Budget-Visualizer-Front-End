@@ -9,6 +9,14 @@ export interface Transaction {
     description?: string
 }
 
+export interface BalanceInterface {
+    id: number,
+    userId: number,
+    savings: number,
+    budget: number,
+    income: number,
+}
+
 class TransactionApi {
     private baseUrl = 'http://localhost:5000';
 
@@ -21,7 +29,7 @@ class TransactionApi {
                 description
             });
 
-            if (response.status == 200) {
+            if (response.status === 200) {
                 return response;
             }
         } catch (error) {
@@ -43,18 +51,49 @@ class TransactionApi {
         }
     }
 
-    async getTransactionsForMonth(userId: string, month: number) {
+    async getTransactionsForMonth(month: number, userId?: number) {
         try {
-            const response: AxiosResponse<Transaction[]> = await axios.get(`${this.baseUrl}/transactions/month`, {
-                params: { userId, month}
+            if (month === null || month === undefined) {
+                const date = new Date();
+                month = date.getMonth() + 1;
+            }
+    
+            if (userId === undefined) {
+                throw new Error('userId is undefined')
+            }
+    
+            const response: AxiosResponse<any> = await axios.get(`${this.baseUrl}/transactions/month`, {
+                params: { userId, month }
             });
-
+    
             if (response.status === 200) {
                 return response.data;
             }
         } catch (error) {
             throw error;
         }
+    }
+
+    async getBalance(userId: number): Promise<BalanceInterface[]> {
+        try {
+            const response = await axios.get(`${this.baseUrl}/balance`, {
+                params: { userId }
+            });
+
+            if (response.status === 200) {
+                return response.data.balance.map((balance: any) => ({
+                    id: balance.id,
+                    savings: balance.savings,
+                    income: balance.income,
+                    budget: balance.budget,
+                    userId: balance.userId,
+                }));
+            }
+        } catch (error) {
+            throw error;
+        }
+
+        return [];
     }
 }
 
