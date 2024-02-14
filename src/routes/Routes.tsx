@@ -6,6 +6,7 @@ import Dashboard from '../pages/Dashboard';
 import AuthApi from '../services/authApi';
 import PrivateRoute from './PrivateRoutes';
 import InitialPage from './InitialRoute';
+// import TransactionsPage from '../pages/Transactions';
 
 const MyRoutes = () => {
     const authApiInstance = AuthApi;
@@ -17,6 +18,7 @@ const MyRoutes = () => {
                 <Route path="/login" element={<Login authApi={authApiInstance} />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/dashboard/:id" element={<PrivateRoute element={<Dashboard />} />} />
+                {/* <Route path="/transactions/:id" element={<PrivateRoute element={<TransactionsPage />} />} /> */}
             </Routes>
         </Router>
     );

@@ -3,7 +3,7 @@ import { LineChart } from '@mui/x-charts';
 
 interface DataItem {
     price: number;
-    date: string;
+    date: Date;
 }
 
 interface CustomLineChartProps {
@@ -11,7 +11,7 @@ interface CustomLineChartProps {
 }
 
 
-export default function CustomLineChart({ data }: CustomLineChartProps) {
+export default function CustomLineChart({ data, max }: CustomLineChartProps & { max : number }) {
     const cumulativePrices = data.reduce((acc: number[], curr: any, index: number) => {
         const sum = index === 0 ? curr.price : acc[index - 1] + curr.price;
         acc.push(sum);
@@ -21,7 +21,7 @@ export default function CustomLineChart({ data }: CustomLineChartProps) {
     return (
         <LineChart
             xAxis={[{ scaleType: 'band', data: data.map((item: any) => item.date) }]}
-            yAxis={[{ min: 0, max: cumulativePrices[cumulativePrices.length - 1] + 500 }]}
+            yAxis={[{ min: 0, max: max }]}
             series={[
                 {
                     curve: "natural",
@@ -29,8 +29,8 @@ export default function CustomLineChart({ data }: CustomLineChartProps) {
                     area: true,
                 },
             ]}
-            width={window.innerWidth * 0.5}
-            height={window.innerHeight * 0.5}
+            width={700}
+            height={500}
         />
     );
 }

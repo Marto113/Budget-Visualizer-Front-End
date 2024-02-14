@@ -3,17 +3,16 @@ import { PieChart } from '@mui/x-charts/PieChart';
 import { useDrawingArea } from '@mui/x-charts/hooks';
 import { styled } from '@mui/material/styles';
 
-const data = [
-    { value: 5, label: 'A' },
-    { value: 10, label: 'B' },
-    { value: 15, label: 'C' },
-    { value: 20, label: 'D' },
-];
+interface TransactionData {
+    category: string;
+    amount: number;
+}
 
-const size = {
-    width: 400,
-    height: 500
-};
+interface CustomPieChartProps {
+    data: TransactionData[];
+}
+
+const palette = ['#3BB273', '#E1BC29', '#4D9DE0', '#F6828C', '#8F3985', '#FA7921', '#A20021', '#4A0D67', "#1D2F6F, '#0014A8"];
 
 const StyledText = styled('text')(({ theme }) => ({
     fill: theme.palette.text.primary,
@@ -22,19 +21,23 @@ const StyledText = styled('text')(({ theme }) => ({
     fontSize: 20,
 }));
 
-function PieCenterLabel({ children }: { children: React.ReactNode }) {
-    const { width, height, left, top } = useDrawingArea();
-    return (
-        <StyledText x={left + width / 2} y={top + height / 2}>
-            {children}
-        </StyledText>
-    );
-}
+export default function CustomPieChart({ data }: CustomPieChartProps) {
+    const seriesData = data.map(({ category, amount }, index) => ({
+        id: index.toString(),
+        value: amount,
+        label: category
+    }));
 
-export default function CustomPieChart() {
     return (
-        <PieChart series={[{ data, innerRadius: 80, paddingAngle: 5, }]} {...size}>
-            <PieCenterLabel>Center label</PieCenterLabel>
+        <PieChart 
+            colors={palette}
+            series={[{ 
+                data: seriesData, 
+                highlightScope: { faded: 'global', highlighted: 'item' },
+                faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
+            }]} 
+            height={400}
+        >
         </PieChart>
     );
 }

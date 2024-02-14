@@ -17,12 +17,18 @@ export interface BalanceInterface {
     income: number,
 }
 
+export interface TransactionData {
+    category: string;
+    amount: number;
+}
+
 class TransactionApi {
     private baseUrl = 'http://localhost:5000';
 
-    async addTransaction(category: string, price: number, name?: string, description?: string): Promise<any> {
+    async addTransaction(userId: number, category: string, price: number, name?: string, description?: string): Promise<any> {
         try {
             const response = await axios.post(`${this.baseUrl}/transactions`, {
+                userId,
                 category,
                 price,
                 name,
@@ -51,28 +57,34 @@ class TransactionApi {
         }
     }
 
-    async getTransactionsForMonth(month: number, userId?: number) {
+    async getTransactionsForMonth(month: number, userId?: number): Promise<Transaction[]> {
         try {
-            if (month === null || month === undefined) {
-                const date = new Date();
-                month = date.getMonth() + 1;
-            }
-    
-            if (userId === undefined) {
-                throw new Error('userId is undefined')
-            }
-    
-            const response: AxiosResponse<any> = await axios.get(`${this.baseUrl}/transactions/month`, {
-                params: { userId, month }
-            });
+            const response: AxiosResponse<any> = await axios.get(`http://localhost:5000/transactions/month?userId=${userId}&month=${month}`);
     
             if (response.status === 200) {
-                return response.data;
+                return response.data.transactions as Transaction[];
+            } else {
+                throw new Error('Unexpected status code: ' + response.status);
             }
         } catch (error) {
             throw error;
         }
     }
+
+    async getTransactionsCategory(month: number, userId?: number): Promise<TransactionData[]> {
+        try {
+            const response: AxiosResponse<any> = await axios.get(`http://localhost:5000/transactions/category?userId=${userId}&month=${month}`);
+    
+            if (response.status === 200) {
+                return response.data as TransactionData[];
+            } else {
+                throw new Error('Unexpected status code: ' + response.status);
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+    
 
     async getBalance(userId: number): Promise<BalanceInterface[]> {
         try {

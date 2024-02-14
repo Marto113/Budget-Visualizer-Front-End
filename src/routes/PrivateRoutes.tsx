@@ -15,22 +15,30 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ element }) => {
     const checkAuth = async () => {
       try {
         const accessToken = AuthApi.getAccessToken();
-        console.log(accessToken);
-        if (!accessToken) {
-          navigate('/');
+        const refreshToken = AuthApi.getRefreshToken();
+
+        if (!accessToken && !refreshToken) {
+          navigate('/login');
           return;
         }
 
-        const isTokenExpired = await AuthApi.isTokenExpired(accessToken);
-
-        if (isTokenExpired) {
+        if (refreshToken && !accessToken) {
           try {
-            await AuthApi.refreshToken();
-          } catch (refreshError) {
-            setError('Error refreshing token');
-            navigate('/');
-            return;
+            const renewToken = await AuthApi.refreshToken();
+            const decodedToken = AuthApi.decodeToken(renewToken);
+            console.log(decodedToken);
+      
+            if (decodedToken && decodedToken.userId) {
+              const userId = decodedToken.userId;
+              navigate(`/dashboard/${userId}`);
+            } else {
+              console.error("User ID not available in the token");
+            }
+          } catch (error) {
+            console.error("Error decoding token or extracting user ID:", error);
           }
+          
+          
         }
 
         setLoading(false);
