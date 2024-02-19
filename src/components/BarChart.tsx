@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { BarChart } from '@mui/x-charts';
 
 interface DataItem {
@@ -8,17 +7,15 @@ interface DataItem {
 
 interface CustomBarChartProps {
     data: DataItem[];
-    month: number; // 0 for January, 11 for December
+    month: number;
     year: number;
 }
 
 function monthToWeeks(month: number, year: number) {
     const firstDay = new Date(year, month, 1);
 
-    const lastDayOfMonth = new Date(year, month + 1, 0); // Set date to last day of previous month
-    lastDayOfMonth.setDate(lastDayOfMonth.getDate()); // Reset to last day of current month
-    console.log(firstDay);
-    console.log(lastDayOfMonth);
+    const lastDayOfMonth = new Date(year, month + 1, 0);
+    lastDayOfMonth.setDate(lastDayOfMonth.getDate());
     const weeks = [];
 
     const adjustedFirstDay = new Date(firstDay.getTime());
@@ -58,7 +55,6 @@ export default function CustomBarChart({ data, month, year }: CustomBarChartProp
         weeks: filteredData.map((item) => item.week),
         prices: filteredData.map((item) => item.price),
     };
-    console.log(chartData.weeks);
     return (
         <BarChart
             xAxis={[{ scaleType: 'band', data: chartData.weeks }]}
@@ -67,8 +63,8 @@ export default function CustomBarChart({ data, month, year }: CustomBarChartProp
                     data: chartData.prices,
                 },
             ]}
-            width={window.innerWidth * 0.5}
-            height={window.innerHeight * 0.5}
+            width={1250}
+            height={700}
         />
     );
 }

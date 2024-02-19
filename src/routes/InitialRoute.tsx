@@ -8,6 +8,7 @@ const InitialPage: React.FC = () => {
     useEffect(() => {
         const checkAccessToken = async () => {
             const accessToken = AuthApi.getAccessToken();
+            const refreshToken = AuthApi.getRefreshToken();
 
             if (accessToken) {
                 try {
@@ -22,8 +23,18 @@ const InitialPage: React.FC = () => {
                 } catch (error) {
                     console.error('Error decoding token or extracting user ID:', error);
                 }
-            } else {
-                navigate('/login');
+            } else if (refreshToken){
+                const renwedToken = await AuthApi.refreshToken();
+
+                const decodedToken = AuthApi.decodeToken(renwedToken);
+
+                if (decodedToken && decodedToken.userId) {
+                    const userId = decodedToken.userId;
+                    navigate(`/dashboard/${userId}`);
+                } else {
+                    console.log('refresh token /login');
+                    navigate('/login');
+                }
             }
         };
 

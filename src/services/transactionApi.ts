@@ -1,7 +1,8 @@
 import axios, { AxiosResponse } from "axios";
 
 export interface Transaction {
-    id: string,
+    userId: number,
+    id: number,
     category: string,
     price: number,
     date: string,
@@ -50,7 +51,7 @@ class TransactionApi {
             });
 
             if (response.status === 200) {
-                return response.data;
+                return response.data.transactions;
             }
         } catch (error) {
             throw error;
@@ -106,6 +107,20 @@ class TransactionApi {
         }
 
         return [];
+    }
+
+    async deleteTransaction(id: number) {
+        try {
+            const response = await axios.delete(`${this.baseUrl}/transactions`, {
+                params: { id }
+            });
+            console.log(response);
+            if(response.status === 200){
+                return response.data;
+            }
+        } catch ( error ) {
+            throw error;
+        }
     }
 }
 
