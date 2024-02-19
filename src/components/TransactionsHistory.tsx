@@ -16,7 +16,7 @@ export default function TransactionHistory() {
     const containerRef = useRef<HTMLDivElement>(null);
     const [visibleTransactions, setVisibleTransactions] = useState<Transaction[]>([]);
     const [showAllTransactions, setShowAllTransactions] = useState(false);
-    const navigate = useNavigate(); // Initialize useNavigate hook
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -66,7 +66,7 @@ export default function TransactionHistory() {
     const handleViewMore = () => {
         setVisibleTransactions(transactions);
         setShowAllTransactions(true);
-        navigate('/another-page'); // Redirect to another page using navigate
+        navigate('/another-page');
     };
 
     return (
@@ -81,7 +81,7 @@ export default function TransactionHistory() {
                         {renderName(transaction.name)}
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ marginTop: 1 }}>
                             <Typography variant="h6" component="div">
-                                ${transaction.price}
+                                {transaction.price} lv
                             </Typography>
                             <div>
                                 <IconButton onClick={() => handleEdit(transaction.userId)} aria-label="edit">

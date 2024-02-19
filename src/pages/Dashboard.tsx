@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import TransactionApi, { Transaction, TransactionData } from '../services/transactionApi';
 import { Box, Button, Card, Divider, Paper, Typography } from '@mui/material';
 import CustomPieChart from '../components/PieChart';
@@ -32,7 +32,7 @@ const Dashboard: React.FC = () => {
             setSelectedYear(date.year());
             setSelectedMonth(date.month() + 1);
         } else {
-            setSelectedYear(1);
+            setSelectedYear(2024);
             setSelectedMonth(1);
         }
     };
@@ -111,10 +111,23 @@ const Dashboard: React.FC = () => {
         return accumulator;
     }, []);
 
+    const barChartData = transactions.reduce((accumulator: any, transaction: any) => {
+        const day = transaction.date;
+        const existingIndex = accumulator.findIndex((item: any) => item.date === day);
+        if (existingIndex !== -1) {
+            accumulator[existingIndex].price += transaction.price;
+        } else {
+            accumulator.push({ date: day, price: transaction.price, category: transaction.category });
+        }
+        return accumulator;
+    }, []);
+
+    console.log(barChartData);
+
     return (
 		<div>
 			<div style={{ marginBottom: '5px'}}>
-				<MenuAppBar />
+                <MenuAppBar userId={userId !== undefined ? userId : null} />
 			</div>
 			<div style={{ display: 'flex', justifyContent: 'space-between'}}>
 				<Paper elevation={1} style={{ padding: '10px', width: '85%', maxWidth: '1920px', marginLeft: '0' }}>
@@ -163,10 +176,10 @@ const Dashboard: React.FC = () => {
 						{transactions.length > 0 && (
 							<>
 								{chartType === 'bar' && (
-									<CustomBarChart data={chartData} month={selectedMonth - 1} year={selectedYear} />
+									<CustomBarChart data={barChartData} month={selectedMonth - 1} year={selectedYear} />
 								)}
 								{chartType === 'line' && (
-									<CustomLineChart data={chartData} max={budget} />
+									<CustomLineChart data={chartData} max={budget}  month={selectedMonth - 1} />
 								)}
 							</>
 						)}
@@ -193,11 +206,11 @@ const Dashboard: React.FC = () => {
                         }}>
                         <Card variant="outlined" sx={{ maxWidth: '100%', margin: '15px' }}>
                             <Box sx={{ p: 1.5 }}>
-                                <Typography variant="h6" component="div" sx={{ maxWidth: '100%', marginBottom: '5px' }}>Budget: ${budget}</Typography>
+                                <Typography variant="h6" component="div" sx={{ maxWidth: '100%', marginBottom: '5px' }}>Budget: {budget} lv</Typography>
                                 <Divider />
-                                <Typography variant="h6" component="div" sx={{ maxWidth: '100%', marginTop: '5px', marginBottom: '5px' }}>Income: ${income}</Typography>
+                                <Typography variant="h6" component="div" sx={{ maxWidth: '100%', marginTop: '5px', marginBottom: '5px' }}>Income: {income} lv</Typography>
                                 <Divider />
-                                <Typography variant="h6" component="div" sx={{ maxWidth: '100%', marginTop: '5px' }}>Savings: ${savings}</Typography>
+                                <Typography variant="h6" component="div" sx={{ maxWidth: '100%', marginTop: '5px' }}>Savings: {savings} lv</Typography>
                             </Box>
                         </Card>
                         <Button 

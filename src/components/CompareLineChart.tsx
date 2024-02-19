@@ -1,14 +1,25 @@
-import { useEffect } from 'react';
-import Highcharts from 'highcharts'
+import React, { useEffect } from 'react';
+import Highcharts from 'highcharts';
 
-interface DataItem {
+export interface DataItem {
+    category: string;
     price: number;
     date: number;
 }
 
-interface CustomLineChartProps {
-    data: DataItem[];
+interface CompareLineChartProps {
+    data1: DataItem[];
+    data2: DataItem[];
+    max: number;
+    month1: number;
+    month2: number;
 }
+
+function dateToString(date: number): string {
+    return date.toString();
+}
+
+const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 function convertToSeriesFormat({ data, month }: { data: DataItem[]; month: number }): DataItem[] {
     const currentDate = new Date();
@@ -28,7 +39,8 @@ function convertToSeriesFormat({ data, month }: { data: DataItem[]; month: numbe
         const existingData = data.find(item => new Date(item.date).getDate() === day);
         return {
             date: day,
-            price: existingData ? existingData.price : 0
+            price: existingData ? existingData.price : 0,
+            category: existingData ? existingData.category : '' // Add category property
         };
     });
 
@@ -43,25 +55,29 @@ function convertToSeriesFormat({ data, month }: { data: DataItem[]; month: numbe
 
     const newData = Object.keys(cumulativePricesByDate).map(date => ({
         date: parseInt(date),
-        price: cumulativePricesByDate[parseInt(date)]
+        price: cumulativePricesByDate[parseInt(date)],
+        category: ''
     }));
 
     return newData;
 }
 
-export default function CustomLineChart({ data, max, month }: CustomLineChartProps & { max: number, month: number }) {
+export default function CompareLineChart({ data1, data2, max, month1, month2 }: CompareLineChartProps) {
     useEffect(() => {
-        const seriesData = convertToSeriesFormat({data, month});
+        const seriesData1 = convertToSeriesFormat({ data: data1, month: month1 });
+        const seriesData2 = convertToSeriesFormat({ data: data2, month: month2 });
+
+        for (let i = 1; i < seriesData1.length; i++) {
+            seriesData1[i].price += seriesData1[i - 1].price;
+            seriesData2[i].price += seriesData2[i - 1].price;
     
-        for (let i = 1; i < seriesData.length; i++) {
-            seriesData[i].price += seriesData[i - 1].price;
-    
-            if (seriesData[i].price > max) {
-                max = seriesData[i].price + 10;
+            if (seriesData1[i].price > max) {
+                max = seriesData1[i].price + 10;
+            }
+            if (seriesData2[i].price > max) {
+                max = seriesData2[i].price + 10;
             }
         }
-
-        console.log(seriesData);
 
         const options: Highcharts.Options = {
             title: {
@@ -77,7 +93,7 @@ export default function CustomLineChart({ data, max, month }: CustomLineChartPro
                 valueSuffix: ' lv',
             },
             xAxis: {
-                categories: seriesData.map(item => item.date.toString()),
+                categories: seriesData1.map(item => item.date.toString()),
             },
             legend: {
                 layout: 'vertical',
@@ -89,13 +105,17 @@ export default function CustomLineChart({ data, max, month }: CustomLineChartPro
                     label: {
                         connectorAllowed: false
                     },
-                    pointStart: seriesData[0].date
+                    pointStart: seriesData1[0].date
                 }
             },
             series: [{
                 type: 'line',
-                name: 'Price',
-                data: seriesData.map(item => item.price)
+                name: `${monthNames[month1]}`,
+                data: seriesData1.map(item => item.price)
+            }, {
+                type: 'line',
+                name: `${monthNames[month2]}`,
+                data: seriesData2.map(item => item.price)
             }],
             responsive: {
                 rules: [{
@@ -113,8 +133,16 @@ export default function CustomLineChart({ data, max, month }: CustomLineChartPro
             }
         };
 
-        Highcharts.chart('container', options);
-    }, [data, max, month]); 
+        const chart = Highcharts.chart('container', options);
 
-    return <div id="container" style={{ width: '100%', height: '700px' }} />;
+        const resizeHandler = () => {
+            chart.reflow();
+        };
+        window.addEventListener('resize', resizeHandler);
+        return () => {
+            window.removeEventListener('resize', resizeHandler);
+        };
+    }, [data1, data2, max, month1, month2]); 
+
+    return <div id="container" style={{ width: '100%', height: '100%', overflow: 'hidden' }} />;
 }

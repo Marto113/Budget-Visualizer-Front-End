@@ -1,8 +1,10 @@
-import { BarChart } from '@mui/x-charts';
+import { useEffect } from 'react';
+import Highcharts, { SeriesOptionsType } from 'highcharts';
 
 interface DataItem {
     price: number;
-    date: Date;
+    date: string;
+    category: string;
 }
 
 interface CustomBarChartProps {
@@ -11,61 +13,102 @@ interface CustomBarChartProps {
     year: number;
 }
 
-function monthToWeeks(month: number, year: number) {
-    const firstDay = new Date(year, month, 1);
-
-    const lastDayOfMonth = new Date(year, month + 1, 0);
-    lastDayOfMonth.setDate(lastDayOfMonth.getDate());
-    const weeks = [];
-
-    const adjustedFirstDay = new Date(firstDay.getTime());
-
-    for (let i = 0; i < Math.ceil((lastDayOfMonth.getTime() - adjustedFirstDay.getTime()) / (7 * 24 * 60 * 60 * 1000)); i++) {
-        const weekStart = new Date(adjustedFirstDay.getTime() + i * 7 * 24 * 60 * 60 * 1000);
-        const weekEnd = new Date(weekStart.getTime() + 6 * 24 * 60 * 60 * 1000);
-
-        const weekFirstDay = weekStart.getDate();
-        let weekLastDay = weekEnd.getDate();
-
-        if (weekLastDay > lastDayOfMonth.getDate()) {
-            weekLastDay = lastDayOfMonth.getDate();
-        }
-
-        weeks.push([weekFirstDay, weekLastDay]);
-    }
-
-    return weeks;
+interface SeriesData {
+    name: string;
+    data: number[];
+    type?: string;
 }
+
 
 export default function CustomBarChart({ data, month, year }: CustomBarChartProps) {
-    const weeks = monthToWeeks(month, year);
-    const filteredData = weeks.map((week) => {
-        const weekData = data.filter(
-            (item) =>
-                new Date(item.date).getUTCFullYear() === year &&
-                new Date(item.date).getUTCMonth() === month &&
-                new Date(item.date).getUTCDate() >= week[0] &&
-                new Date(item.date).getUTCDate() <= week[1]
-        );
-        const totalPrice = weekData.reduce((sum, item) => sum + item.price, 0);
-        return { week: `${week[0]}-${week[1]}`, price: totalPrice };
+    const weeksInMonth: { [key: string]: DataItem[] } = {};
+
+    data.forEach((item) => {
+        const itemDate = new Date(item.date);
+        const weekNumber = Math.ceil(itemDate.getDate() / 7);
+        if (!weeksInMonth[`Week ${weekNumber}`]) {
+            weeksInMonth[`Week ${weekNumber}`] = [];
+        }
+        weeksInMonth[`Week ${weekNumber}`].push(item);
     });
 
-    const chartData = {
-        weeks: filteredData.map((item) => item.week),
-        prices: filteredData.map((item) => item.price),
-    };
-    return (
-        <BarChart
-            xAxis={[{ scaleType: 'band', data: chartData.weeks }]}
-            series={[
-                {
-                    data: chartData.prices,
-                },
-            ]}
-            width={1250}
-            height={700}
-        />
-    );
-}
+    const categories = Array.from(new Set(data.map((item) => item.category)));
 
+    const seriesData: SeriesData[] = categories.map((category) => {
+        const prices = Array.from({ length: 5 }, (_, index) => {
+            const weekData = weeksInMonth[`Week ${index + 1}`] || [];
+            return weekData
+                .filter((item) => item.category === category)
+                .reduce((total, item) => total + item.price, 0);
+        });
+        return {
+            name: category,
+            data: prices,
+            type: 'bar',
+        };
+    });
+
+    useEffect(() => {
+        const options: Highcharts.Options = {
+            chart: {
+                type: 'bar',
+            },
+            title: {
+                text: 'Monthly Category Expenses',
+                align: 'left',
+            },
+            xAxis: {
+                categories: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'],
+                title: {
+                    text: null,
+                },
+                gridLineWidth: 1,
+                lineWidth: 0,
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Price',
+                    align: 'high',
+                },
+                labels: {
+                    overflow: 'justify',
+                },
+                gridLineWidth: 0,
+            },
+            tooltip: {
+                valueSuffix: ' lv',
+            },
+            plotOptions: {
+                bar: {
+                    borderRadius: '50%',
+                    grouping: true,
+                    dataLabels: {
+                        enabled: false,
+                    },
+                    groupPadding: 0.1,
+                },
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'top',
+                x: -40,
+                y: 80,
+                floating: true,
+                borderWidth: 1,
+                backgroundColor:
+                    Highcharts.defaultOptions.legend!.backgroundColor || '#FFFFFF',
+                shadow: true,
+            },
+            credits: {
+                enabled: false,
+            },
+            series: seriesData as SeriesOptionsType[],
+        };
+
+        Highcharts.chart('container', options);
+    }, [data, month, year]);
+
+    return <div id="container" style={{ width: '100%', height: '700px' }} />;
+}

@@ -23,6 +23,12 @@ export interface TransactionData {
     amount: number;
 }
 
+export interface CategoryData {
+    category: string;
+    price: number;
+    date: number;
+}
+
 class TransactionApi {
     private baseUrl = 'http://localhost:5000';
 
@@ -80,6 +86,20 @@ class TransactionApi {
                 return response.data as TransactionData[];
             } else {
                 throw new Error('Unexpected status code: ' + response.status);
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getCategories(month: number, year: number, category: string, userId?: number): Promise<CategoryData[]> {
+        try {
+            const response = await axios.get(`${this.baseUrl}/transactions/categories?userId=${userId}&month=${month}&year=${year}&category=${category}`);
+
+            if ( response.status === 200 ) {
+                return response.data.transactions;
+            } else {
+                throw new Error('Unxpecrted status code: ' + response.status);
             }
         } catch (error) {
             throw error;
