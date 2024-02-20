@@ -15,10 +15,6 @@ interface CompareLineChartProps {
     month2: number;
 }
 
-function dateToString(date: number): string {
-    return date.toString();
-}
-
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 function convertToSeriesFormat({ data, month }: { data: DataItem[]; month: number }): DataItem[] {
@@ -35,31 +31,23 @@ function convertToSeriesFormat({ data, month }: { data: DataItem[]; month: numbe
         return day;
     });
 
-    const modifiedData = allDatesInMonth.map(day => {
-        const existingData = data.find(item => new Date(item.date).getDate() === day);
-        return {
-            date: day,
-            price: existingData ? existingData.price : 0,
-            category: existingData ? existingData.category : '' // Add category property
-        };
-    });
-
-    const cumulativePricesByDate: { [date: number]: number } = {};
-    modifiedData.forEach(({ date, price }) => {
-        if (cumulativePricesByDate[date]) {
-            cumulativePricesByDate[date] += price;
+    const cumulativePricesByDate: { [date: number]: { price: number; category: string } } = {};
+    data.forEach(({ date, price, category }) => {
+        const day = new Date(date).getDate();
+        if (cumulativePricesByDate[day]) {
+            cumulativePricesByDate[day].price += price;
         } else {
-            cumulativePricesByDate[date] = price;
+            cumulativePricesByDate[day] = { price, category };
         }
     });
 
-    const newData = Object.keys(cumulativePricesByDate).map(date => ({
-        date: parseInt(date),
-        price: cumulativePricesByDate[parseInt(date)],
-        category: ''
+    const modifiedData = allDatesInMonth.map(day => ({
+        date: day,
+        price: cumulativePricesByDate[day] ? cumulativePricesByDate[day].price : 0,
+        category: cumulativePricesByDate[day] ? cumulativePricesByDate[day].category : ''
     }));
 
-    return newData;
+    return modifiedData;
 }
 
 export default function CompareLineChart({ data1, data2, max, month1, month2 }: CompareLineChartProps) {

@@ -1,97 +1,63 @@
-// import React, { useState, useEffect } from 'react';
-// import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Button, Paper, FilledTextFieldProps, OutlinedTextFieldProps, StandardTextFieldProps, TextFieldVariants } from '@mui/material';
-// import { LocalizationProvider } from '@mui/x-date-pickers';
-// import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-// import { JSX } from 'react/jsx-runtime';
+import React, { useState, useEffect } from 'react';
+import { AppBar, Toolbar, Typography, Container, Grid, Paper } from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import TransactionHistory from '../components/TransactionsHistory';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import MenuAppBar from '../components/AppBar';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import dayjs, { Dayjs } from 'dayjs';
 
-// type Transaction = {
-//   id: number;
-//   name: string;
-//   category: string;
-//   price: number;
-//   date: string;
-// };
+const TransactionsPage: React.FC = () => {
+    const { id } = useParams<{ id: string | undefined }>();
+    const userId = id ? parseInt(id, 10) : undefined;
+    const location = useLocation();
+    const navigate = useNavigate();
 
-// const fetchTransactions = async (month: number, year: number): Promise<Transaction[]> => {
-//   const response = await fetch(`/api/transactions?month=${month}&year=${year}`);
-//   const data = await response.json();
-//   return data;
-// };
+    const initialSelectedDate = parseInt(new URLSearchParams(location.search).get('selectedDate') || '2', 10);
+    const [selectedDate, setSelectedDate] = useState<number>(initialSelectedDate);
 
-// const TransactionsPage: React.FC = () => {
-//   const [transactions, setTransactions] = useSt  // Replace this with your actual API call
-//   ate<Transaction[]>([]);
-//   const [month, setMonth] = useState(new Date().getMonth() + 1);
-// const [year, setYear] = useState(new Date().getFullYear());
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       try {
-//         const data = await fetchTransactions(month, year);
-//         setTransactions(data);
-//       } catch (error) {
-//         console.error('Failed to fetch transactions:', error);
-//       }
-//     };
+    const handleDateChange = (date: number) => {
+        const queryParams = new URLSearchParams(location.search);
+        queryParams.set('selectedDate', date.toString());
+        navigate({ search: queryParams.toString() });
+    };
 
-//     fetchData();
-//   }, [month, year]);
+    useEffect(() => {
+        const newSelectedDate = parseInt(new URLSearchParams(location.search).get('selectedDate') || '2', 10);
 
-//   const handleLoadAll = async () => {
-//     try {
-//       const data = await fetchTransactions(month, year);
-//       setTransactions(data);
-//     } catch (error) {
-//       console.error('Failed to fetch all transactions:', error);
-//     }
-//   };
+        setSelectedDate(newSelectedDate);
+    }, [location.search]);
 
-//   const handleMonthChange = (date: Date | null) => {
-//     if (date) {
-//       setMonth(date.getMonth() + 1);
-//     }
-//   };
+    return (
+        <div>
+            <div style={{ marginBottom: '5px'}}>
+                <MenuAppBar userId={userId !== undefined ? userId : null} />
+            </div>
+            <Container maxWidth="lg" sx={{ marginTop: '2rem' }}>
+                <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                        <Paper sx={{ padding: '1rem' }}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DatePicker
+                                    views={['year', 'month']}
+                                    label="Select month"
+                                    value={selectedDate !== null ? dayjs().month(selectedDate - 1) : null}
+                                    onChange={(date: Dayjs | null) => {
+                                        setSelectedDate(date!.month() + 1);
+                                        handleDateChange(date!.month() + 1);
+                                    }}
+                                />
+                            </LocalizationProvider>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TransactionHistory selectedDate={selectedDate} showViewMoreButton={false} />
+                    </Grid>
+                </Grid>
+            </Container>
+        </div>
+    );
+};
 
-//   const handleYearChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-//     setYear(parseInt(event.target.value));
-//   };
-
-//   return (
-//     <div>
-//       <LocalizationProvider>
-//         <DatePicker
-//           label="Month"
-//           value={month}
-//           onChange={handleMonthChange}
-//           renderInput={(params: JSX.IntrinsicAttributes & { variant?: TextFieldVariants | undefined; } & Omit<FilledTextFieldProps | OutlinedTextFieldProps | StandardTextFieldProps, "variant">) => <TextField {...params} />}
-//         />
-//       </LocalizationProvider>
-//       <TextField label="Year" value={year} onChange={handleYearChange} />
-//       <Button onClick={handleLoadAll}>Load All Transactions</Button>
-//       <TableContainer component={Paper}>
-//         <Table>
-//           <TableHead>
-//             <TableRow>
-//               <TableCell>Name</TableCell>
-//               <TableCell>Category</TableCell>
-//               <TableCell>Price</TableCell>
-//               <TableCell>Date</TableCell>
-//             </TableRow>
-//           </TableHead>
-//           <TableBody>
-//             {transactions.map((transaction) => (
-//               <TableRow key={transaction.id}>
-//                 <TableCell>{transaction.name}</TableCell>
-//                 <TableCell>{transaction.category}</TableCell>
-//                 <TableCell>{transaction.price}</TableCell>
-//                 <TableCell>{new Date(transaction.date).toLocaleDateString()}</TableCell>
-//               </TableRow>
-//             ))}
-//           </TableBody>
-//         </Table>
-//       </TableContainer>
-//     </div>
-//   );
-// };
-
-// export default TransactionsPage;
-export {};
+export default TransactionsPage;

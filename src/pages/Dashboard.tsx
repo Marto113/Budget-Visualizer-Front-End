@@ -14,6 +14,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import TransactionForm from '../components/TransactionForm';
 import TransactionHistory from '../components/TransactionsHistory';
 import MenuAppBar from '../components/AppBar';
+import TransactionHistoryAll from '../components/TransactionHistoryAll';
 
 const Dashboard: React.FC = () => {
     const { id } = useParams<{ id: string | undefined }>();
@@ -228,9 +229,9 @@ const Dashboard: React.FC = () => {
                         <Divider />
                     </Box>
                 </Paper>
-				<Paper elevation={6} style={{ padding: '10px', width: '20%', maxWidth: '1920px', marginLeft: '10px' }}>
-					<TransactionForm />
-					<TransactionHistory />
+				<Paper elevation={6} style={{ padding: '10px', width: '10%', minWidth: '15%', maxWidth: '1920px', marginLeft: '10px' }}>
+					<TransactionForm /> 
+					<TransactionHistoryAll />
 				</Paper>
 			</div>
 		</div>

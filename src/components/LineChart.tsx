@@ -24,29 +24,22 @@ function convertToSeriesFormat({ data, month }: { data: DataItem[]; month: numbe
         return day;
     });
 
-    const modifiedData = allDatesInMonth.map(day => {
-        const existingData = data.find(item => new Date(item.date).getDate() === day);
-        return {
-            date: day,
-            price: existingData ? existingData.price : 0
-        };
-    });
-
     const cumulativePricesByDate: { [date: number]: number } = {};
-    modifiedData.forEach(({ date, price }) => {
-        if (cumulativePricesByDate[date]) {
-            cumulativePricesByDate[date] += price;
+    data.forEach(({ date, price }) => {
+        const day = new Date(date).getDate();
+        if (cumulativePricesByDate[day]) {
+            cumulativePricesByDate[day] += price;
         } else {
-            cumulativePricesByDate[date] = price;
+            cumulativePricesByDate[day] = price;
         }
     });
 
-    const newData = Object.keys(cumulativePricesByDate).map(date => ({
-        date: parseInt(date),
-        price: cumulativePricesByDate[parseInt(date)]
+    const modifiedData = allDatesInMonth.map(day => ({
+        date: day,
+        price: cumulativePricesByDate[day] || 0
     }));
 
-    return newData;
+    return modifiedData;
 }
 
 export default function CustomLineChart({ data, max, month }: CustomLineChartProps & { max: number, month: number }) {

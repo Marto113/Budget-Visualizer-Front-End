@@ -14,7 +14,7 @@ const ComparisonPage: React.FC = () => {
     const userId = id ? parseInt(id, 10) : 1;
     const [selectedMonth1, setSelectedMonth1] = useState<number | null>(null);
     const [selectedMonth2, setSelectedMonth2] = useState<number | null>(null);
-    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+    const [selectedCategory, setSelectedCategory] = useState<string | null>('');
     const [year1, setYear1] = useState<number | null>(null);
     const [year2, setYear2] = useState<number | null>(null);
     const [data1, setData1] = useState<CategoryData[]>([]);
