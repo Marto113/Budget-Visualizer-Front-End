@@ -22,6 +22,9 @@ const MenuAppBar: React.FC<MenuAppBarProps> = ({ userId }) => {
     };
 
     const handleClose = () => {
+        document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        navigate('/login');
         setAnchorEl(null);
     };
 
@@ -43,7 +46,7 @@ const MenuAppBar: React.FC<MenuAppBarProps> = ({ userId }) => {
                                 </Typography>
                                 <Typography variant="h6" component="div" sx={{ margin: '10px' }} 
                                             onClick={() => handleNavigate(`/transactions/${userId}`)}>
-                                    Transactions
+                                    History
                                 </Typography>
                                 <Typography variant="h6" component="div" sx={{ margin: '10px' }} 
                                             onClick={() => handleNavigate(`/compare/${userId}`)}>

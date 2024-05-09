@@ -14,18 +14,20 @@ const TransactionsPage: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const initialSelectedDate = parseInt(new URLSearchParams(location.search).get('selectedDate') || '2', 10);
+    const initialSelectedDate = dayjs().month() + 1;
     const [selectedDate, setSelectedDate] = useState<number>(initialSelectedDate);
 
-    const handleDateChange = (date: number) => {
-        const queryParams = new URLSearchParams(location.search);
-        queryParams.set('selectedDate', date.toString());
-        navigate({ search: queryParams.toString() });
+    const handleDateChange = (date: Dayjs | null) => {
+        if (date) {
+            setSelectedDate(date.month() + 1);
+            const queryParams = new URLSearchParams(location.search);
+            queryParams.set('selectedDate', (date.month() + 1).toString());
+            navigate({ search: queryParams.toString() });
+        }
     };
 
     useEffect(() => {
-        const newSelectedDate = parseInt(new URLSearchParams(location.search).get('selectedDate') || '2', 10);
-
+        const newSelectedDate = parseInt(new URLSearchParams(location.search).get('selectedDate') || initialSelectedDate.toString(), 10);
         setSelectedDate(newSelectedDate);
     }, [location.search]);
 
@@ -42,11 +44,8 @@ const TransactionsPage: React.FC = () => {
                                 <DatePicker
                                     views={['year', 'month']}
                                     label="Select month"
-                                    value={selectedDate !== null ? dayjs().month(selectedDate - 1) : null}
-                                    onChange={(date: Dayjs | null) => {
-                                        setSelectedDate(date!.month() + 1);
-                                        handleDateChange(date!.month() + 1);
-                                    }}
+                                    value={dayjs().month(selectedDate - 1)}
+                                    onChange={handleDateChange}
                                 />
                             </LocalizationProvider>
                         </Paper>

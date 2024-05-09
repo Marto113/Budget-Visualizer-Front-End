@@ -15,6 +15,7 @@ import TransactionForm from '../components/TransactionForm';
 import MenuAppBar from '../components/AppBar';
 import TransactionHistoryAll from '../components/TransactionHistoryAll';
 import '../index.css';
+import Budget from '../components/Budget';
 
 const Dashboard: React.FC = () => {
     const { id } = useParams<{ id: string | undefined }>();
@@ -22,11 +23,8 @@ const Dashboard: React.FC = () => {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [transactionsCategory, setTransactionsCategory] = useState<TransactionData[]>([]);
     const [chartType, setChartType] = useState<'line' | 'bar' | 'circular'>('bar');
-    const [budget, setBudget] = useState<number>(100);
-    const [savings, setSavings] = useState<number>(100);
-    const [income, setIncome] = useState<number>(100);
-    const [selectedYear, setSelectedYear] = useState<number>(dayjs().year()); // Set current year
-    const [selectedMonth, setSelectedMonth] = useState<number>(dayjs().month() + 1); // Set current month
+    const [selectedYear, setSelectedYear] = useState<number>(dayjs().year());
+    const [selectedMonth, setSelectedMonth] = useState<number>(dayjs().month() + 1);
 
     const handleDateChange = (date: Dayjs | null) => {
         if (date) {
@@ -53,26 +51,6 @@ const Dashboard: React.FC = () => {
             }
         };
 
-        const fetchBalance = async () => {
-            try {
-                if (userId) {
-                    const transactionApi = new TransactionApi();
-                    const balanceData = await transactionApi.getBalance(userId);
-                    if (balanceData) {
-                        setSavings(balanceData[0].savings);
-                        setIncome(balanceData[0].income);
-                        setBudget(balanceData[0].budget);
-                    } else {
-                        console.error('Error: Balance data is missing');
-                    }
-                } else {
-                    console.error('No user id found');
-                }
-            } catch (error) {
-                console.error('Error fetching balance:', error);
-            }
-        };
-
         const fetchCategory = async () => {
             const transactionApi = new TransactionApi();
             try {
@@ -89,7 +67,6 @@ const Dashboard: React.FC = () => {
 
         if (userId) {
             fetchData();
-            fetchBalance();
             fetchCategory();
         }
     }, [userId, selectedMonth, selectedYear]);
@@ -146,7 +123,7 @@ const Dashboard: React.FC = () => {
                                             <CustomBarChart data={barChartData} month={selectedMonth - 1} year={selectedYear} />
                                         )}
                                         {chartType === 'line' && (
-                                            <CustomLineChart data={chartData} max={budget} month={selectedMonth - 1} />
+                                            <CustomLineChart data={chartData} max={400} month={selectedMonth - 1} />
                                         )}
                                     </>
                                 )}
@@ -207,28 +184,7 @@ const Dashboard: React.FC = () => {
                             flexDirection: 'column',
                             maxHeight: '1080px',
                         }}>
-                        <Card variant="outlined" sx={{ maxWidth: '100%', margin: '15px' }}>
-                            <Box sx={{ p: 1.5 }}>
-                                <Typography variant="h6" component="div" sx={{ maxWidth: '100%', marginBottom: '5px' }}>Budget: {budget} lv</Typography>
-                                <Divider />
-                                <Typography variant="h6" component="div" sx={{ maxWidth: '100%', marginTop: '5px', marginBottom: '5px' }}>Income: {income} lv</Typography>
-                                <Divider />
-                                <Typography variant="h6" component="div" sx={{ maxWidth: '100%', marginTop: '5px' }}>Savings: {savings} lv</Typography>
-                            </Box>
-                            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                                <Button
-                                    variant="outlined"
-                                    sx={{
-                                        width: '50%',
-                                        margin: '15px 0',
-                                        marginTop: '0px'
-                                    }}
-                                    startIcon={<EditIcon />}
-                                >
-                                    Edit
-                                </Button>
-                            </Box>
-                        </Card>
+                        <Budget />
 
                         <Divider />
                     </form>

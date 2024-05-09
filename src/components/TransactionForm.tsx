@@ -127,7 +127,7 @@ const TransactionForm: React.FC<{ onSuccess: () => Promise<void>; }> = ({ onSucc
                     onChange={handleInputChange}
                 />
                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <Button type="submit" variant="contained" sx={{width: '50%'}}>Add transaction</Button>
+                    <Button type="submit" variant="contained" sx={{width: '50%'}}>Add</Button>
                 </Box>
                 <Divider />
             </form>

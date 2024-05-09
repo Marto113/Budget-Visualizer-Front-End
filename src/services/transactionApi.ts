@@ -52,6 +52,25 @@ class TransactionApi {
         }
     }
 
+
+    async updateBalance(userId: number, budget: number, savings: number, income: number): Promise<void> {
+        try {
+            const response = await axios.put(`${this.baseUrl}/balance`, {
+                userId,
+                budget,
+                savings,
+                income
+            });
+
+            if (response.status !== 200) {
+                throw new Error('Failed to update balance');
+            }
+        } catch (error) {
+            throw new Error('Failed to update balance: ' + error);
+        }
+    }
+
+
     async getTransactions(userId?: number) {
         try {
             const response: AxiosResponse<any> = await axios.get(`${this.baseUrl}/transactions`, {
