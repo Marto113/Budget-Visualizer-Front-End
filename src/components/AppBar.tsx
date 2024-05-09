@@ -37,13 +37,16 @@ const MenuAppBar: React.FC<MenuAppBarProps> = ({ userId }) => {
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         {userId && (
                             <>
-                                <Typography variant="h6" component="div" sx={{ margin: '10px' }} onClick={() => handleNavigate(`/dashboard/${userId}`)}>
+                                <Typography variant="h6" component="div" sx={{ margin: '10px' }} 
+                                            onClick={() => handleNavigate(`/dashboard/${userId}`)}>
                                     Dashboard
                                 </Typography>
-                                <Typography variant="h6" component="div" sx={{ margin: '10px' }} onClick={() => handleNavigate(`/transactions/${userId}`)}>
+                                <Typography variant="h6" component="div" sx={{ margin: '10px' }} 
+                                            onClick={() => handleNavigate(`/transactions/${userId}`)}>
                                     Transactions
                                 </Typography>
-                                <Typography variant="h6" component="div" sx={{ margin: '10px' }} onClick={() => handleNavigate(`/compare/${userId}`)}>
+                                <Typography variant="h6" component="div" sx={{ margin: '10px' }} 
+                                            onClick={() => handleNavigate(`/compare/${userId}`)}>
                                     Compare
                                 </Typography>
                             </>

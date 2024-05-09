@@ -10,16 +10,33 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import AuthApi from '../services/authApi'; // Import your AuthApi
+import { useNavigate } from 'react-router-dom';
 
 const theme = createTheme();
 
 const Register: React.FC = () => {
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
+	const [errorMessage, setErrorMessage] = useState('');
+	const navigate = useNavigate();
 
-	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		// Handle registration logic here
+		try {
+			const response = await AuthApi.register(username, password);
+			// Handle successful registration here, e.g., redirect to another page
+			console.log('Registration successful:', response);
+			navigate(`/dashboard/${response}`);
+		} catch (error: any) {
+			if (error.response.status === 409) {
+				setErrorMessage('Username already exists');
+			} else if (error.response.status === 400) {
+				setErrorMessage(error.response.data.error);
+			} else {
+				setErrorMessage('An error occurred during registration');
+			}
+		}
 	};
 
 	return (
@@ -52,6 +69,8 @@ const Register: React.FC = () => {
 							autoFocus
 							value={username}
 							onChange={(e) => setUsername(e.target.value)}
+							error={errorMessage === 'Username already exists'}
+							helperText={errorMessage === 'Username already exists' ? errorMessage : ''}
 						/>
 						<TextField
 							margin="normal"
@@ -64,6 +83,8 @@ const Register: React.FC = () => {
 							autoComplete="new-password"
 							value={password}
 							onChange={(e) => setPassword(e.target.value)}
+							error={errorMessage.includes('Password')}
+							helperText={errorMessage.includes('Password') ? errorMessage : ''}
 						/>
 						<Button
 							type="submit"

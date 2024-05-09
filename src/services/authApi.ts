@@ -29,6 +29,23 @@ class AuthApi implements AuthApiInterface {
         return '';
     }
 
+    async register(username: string, password: string): Promise<void> {
+        try {
+            const response = await axios.post(`${this.baseUrl}/user/register`, {
+                username,
+                password,
+            });
+
+            if (response.status === 200) {
+                const id = response.data.userId;
+                setTokenCookies(response.data.accessToken, response.data.refreshToken);
+                return id;
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+
     getAccessToken(): string | null {
         return getCookie('accessToken');
     }
@@ -64,7 +81,7 @@ class AuthApi implements AuthApiInterface {
             const response = await axios.post(`${this.baseUrl}/auth/refresh-token`, {
                 refreshToken: refreshToken,
             });
-            console.log(response);
+
             if (response.status === 200) {
                 setTokenCookies(response.data.accessToken, response.data.refreshToken);
             }

@@ -32,13 +32,14 @@ const InitialPage: React.FC = () => {
                     const userId = decodedToken.userId;
                     navigate(`/dashboard/${userId}`);
                 } else {
-                    console.log('refresh token /login');
                     navigate('/login');
                 }
             }
         };
 
         checkAccessToken();
+        navigate('/login');
+        
     }, [navigate]);
 
     return <div>Redirecting...</div>;

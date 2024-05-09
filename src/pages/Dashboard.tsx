@@ -12,9 +12,9 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import TransactionForm from '../components/TransactionForm';
-import TransactionHistory from '../components/TransactionsHistory';
 import MenuAppBar from '../components/AppBar';
 import TransactionHistoryAll from '../components/TransactionHistoryAll';
+import '../index.css';
 
 const Dashboard: React.FC = () => {
     const { id } = useParams<{ id: string | undefined }>();
@@ -25,8 +25,8 @@ const Dashboard: React.FC = () => {
     const [budget, setBudget] = useState<number>(100);
     const [savings, setSavings] = useState<number>(100);
     const [income, setIncome] = useState<number>(100);
-    const [selectedYear, setSelectedYear] = useState<number>(2024);
-    const [selectedMonth, setSelectedMonth] = useState<number>(2);
+    const [selectedYear, setSelectedYear] = useState<number>(dayjs().year()); // Set current year
+    const [selectedMonth, setSelectedMonth] = useState<number>(dayjs().month() + 1); // Set current month
 
     const handleDateChange = (date: Dayjs | null) => {
         if (date) {
@@ -41,12 +41,6 @@ const Dashboard: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             const transactionApi = new TransactionApi();
-
-            if (selectedMonth == null) {
-                const currentDate = new Date();
-                setSelectedMonth(currentDate.getMonth() + 1);
-            }
-
             try {
                 const transaction = await transactionApi.getTransactionsForMonth(selectedMonth, userId!);
                 if (transaction !== undefined) {
@@ -81,7 +75,6 @@ const Dashboard: React.FC = () => {
 
         const fetchCategory = async () => {
             const transactionApi = new TransactionApi();
-
             try {
                 const categoryData = await transactionApi.getTransactionsCategory(selectedMonth, userId);
                 if (categoryData !== undefined) {
@@ -123,87 +116,96 @@ const Dashboard: React.FC = () => {
         return accumulator;
     }, []);
 
-    console.log(barChartData);
+    const refreshTransactions = async () => {
+        const transactionApi = new TransactionApi();
+        try {
+            const transaction = await transactionApi.getTransactionsForMonth(selectedMonth, userId!);
+            if (transaction !== undefined) {
+                setTransactions(transaction);
+            } else {
+                console.error('Transactions data is undefined');
+            }
+        } catch (error) {
+            console.error('Error fetching transactions:', error);
+        }
+    };
 
     return (
-		<div>
-			<div style={{ marginBottom: '5px'}}>
+        <>
+            <div className="app-bar" style={{ marginBottom: '5px'}}>
                 <MenuAppBar userId={userId !== undefined ? userId : null} />
-			</div>
-			<div style={{ display: 'flex', justifyContent: 'space-between'}}>
-				<Paper elevation={1} style={{ padding: '10px', width: '85%', maxWidth: '1920px', marginLeft: '0' }}>
-					<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' , marginBottom: '10px'}}>
-						<div>
-							<LocalizationProvider dateAdapter={AdapterDayjs}>
-								<DemoContainer components={['DatePicker']}>
-									<DatePicker
-										label={''}
-										openTo="year"
-										views={['year', 'month']}
-										value={selectedMonth !== null ? dayjs().month(selectedMonth - 1) : null}
-										onChange={handleDateChange}
-									/>
-								</DemoContainer>
-							</LocalizationProvider>
-						</div>
-						<div>
-							<Button
-								variant={chartType === 'line' ? "contained" : "outlined"}
-								onClick={() => setChartType('line')}
-								sx={{ ml: 1, mr: 1 }}
-							>
-								Line
-							</Button>
-		
-							<Button
-								variant={chartType === 'bar' ? "contained" : "outlined"}
-								onClick={() => setChartType('bar')}
-								sx={{ ml: 1, mr: 1 }}
-							>
-								Bar
-							</Button>
-		
-							<Button
-								variant={chartType === 'circular' ? "contained" : "outlined"}
-								onClick={() => setChartType('circular')}
-								sx={{ ml: 1, mr: 1 }}
-							>
-								Circular
-							</Button>
-						</div>
-					</div>
+            </div>
+            <div className="main-content" style={{ display: 'flex', gap: '20px', padding: '20px' }}>
+                <div className="chart-container">
+                    <Paper elevation={1}>
+                        <div>
+                            <div className="chart-wrapper" style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '20px' }}>
+                                {transactions.length > 0 && (
+                                    <>
+                                        {chartType === 'bar' && (
+                                            <CustomBarChart data={barChartData} month={selectedMonth - 1} year={selectedYear} />
+                                        )}
+                                        {chartType === 'line' && (
+                                            <CustomLineChart data={chartData} max={budget} month={selectedMonth - 1} />
+                                        )}
+                                    </>
+                                )}
+                                {transactionsCategory.length > 0 && (
+                                    <>
+                                        {chartType === 'circular' && (
+                                            <CustomPieChart data={transactionsCategory} />
+                                        )}
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </Paper>
+                </div>
+                <div className="sidebar">
+                    <Paper elevation={6} style={{ width: '100%', flexDirection: 'column' }}>
+                    <div className="date-picker-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DemoContainer components={['DatePicker']}>
+                                        <DatePicker
+                                            label={''}
+                                            openTo="year"
+                                            views={['year', 'month']}
+                                            value={selectedMonth !== null ? dayjs().month(selectedMonth - 1) : null}
+                                            onChange={handleDateChange}
+                                        />
+                                    </DemoContainer>
+                                </LocalizationProvider>
+                            </div>
+                            <div className="chart-buttons" style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+                                <Button
+                                    variant={chartType === 'line' ? "contained" : "outlined"}
+                                    onClick={() => setChartType('line')}
+                                    sx={{ ml: 1, mr: 1 }}
+                                >
+                                    Line
+                                </Button>
 
-					<div style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '20px' }}>
-						{transactions.length > 0 && (
-							<>
-								{chartType === 'bar' && (
-									<CustomBarChart data={barChartData} month={selectedMonth - 1} year={selectedYear} />
-								)}
-								{chartType === 'line' && (
-									<CustomLineChart data={chartData} max={budget}  month={selectedMonth - 1} />
-								)}
-							</>
-						)}
-				
-						{transactionsCategory.length > 0 && (
-							<>
-								{chartType === 'circular' && (
-									<CustomPieChart data={transactionsCategory} />
-								)}
-							</>
-						)}
-		
-					</div>
-				</Paper>
-                <Paper elevation={6} style={{ padding: '10px', width: '20%', maxWidth: '1920px', marginLeft: '10px', flexDirection: 'column' }}>
-                    <Box component="form"
-                        sx={{
+                                <Button
+                                    variant={chartType === 'bar' ? "contained" : "outlined"}
+                                    onClick={() => setChartType('bar')}
+                                    sx={{ ml: 1, mr: 1 }}
+                                >
+                                    Bar
+                                </Button>
+
+                                <Button
+                                    variant={chartType === 'circular' ? "contained" : "outlined"}
+                                    onClick={() => setChartType('circular')}
+                                    sx={{ ml: 1, mr: 1 }}
+                                >
+                                    Circular
+                                </Button>
+                            </div>
+                    <form
+                        style={{
                             display: 'flex',
                             flexDirection: 'column',
-                            margin: '15px',
-                            gap: '1rem',
                             maxHeight: '1080px',
-                            '& .MuiTextField-root': { width: '100%' },
                         }}>
                         <Card variant="outlined" sx={{ maxWidth: '100%', margin: '15px' }}>
                             <Box sx={{ p: 1.5 }}>
@@ -213,29 +215,37 @@ const Dashboard: React.FC = () => {
                                 <Divider />
                                 <Typography variant="h6" component="div" sx={{ maxWidth: '100%', marginTop: '5px' }}>Savings: {savings} lv</Typography>
                             </Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                                <Button
+                                    variant="outlined"
+                                    sx={{
+                                        width: '50%',
+                                        margin: '15px 0',
+                                        marginTop: '0px'
+                                    }}
+                                    startIcon={<EditIcon />}
+                                >
+                                    Edit
+                                </Button>
+                            </Box>
                         </Card>
-                        <Button 
-                            variant="outlined" 
-                            sx={{ 
-                                width: '100%', 
-                                alignSelf: 'flex-start',
-                                margin: '15px', 
-                                marginTop: '0px' 
-                            }} 
-                            startIcon={<EditIcon />}
-                        >
-                            Edit
-                        </Button>
+
                         <Divider />
-                    </Box>
-                </Paper>
-				<Paper elevation={6} style={{ padding: '10px', width: '10%', minWidth: '15%', maxWidth: '1920px', marginLeft: '10px' }}>
-					<TransactionForm /> 
-					<TransactionHistoryAll />
-				</Paper>
-			</div>
-		</div>
-	);
+                    </form>
+                    
+                    <TransactionForm onSuccess={refreshTransactions} />
+
+                    </Paper>
+                    
+                </div>
+            </div>
+            <div className='transaction-history'>
+                <Card variant="outlined" sx={{ maxWidth: '100%', margin: '15px' }}>
+                    <TransactionHistoryAll />
+                </Card>
+            </div>
+        </>
+    );
 }
-					
+
 export default Dashboard;

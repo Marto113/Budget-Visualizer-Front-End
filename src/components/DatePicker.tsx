@@ -29,10 +29,6 @@ export default function DatePickerOpenTo() {
                     onChange={handleDateChange}
                 />
             </DemoContainer>
-            <p>
-                Selected Date: {selectedDate ? selectedDate.format('YYYY-MM-DD') : 'None'}
-            </p>
-            <p>Selected Year: {selectedYear !== null ? selectedYear : 'None'}</p>
         </LocalizationProvider>
     );
 }

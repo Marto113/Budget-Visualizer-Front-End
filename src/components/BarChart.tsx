@@ -23,6 +23,8 @@ interface SeriesData {
 export default function CustomBarChart({ data, month, year }: CustomBarChartProps) {
     const weeksInMonth: { [key: string]: DataItem[] } = {};
 
+    // за всеки елемент се извлича датата му
+    // изчислява се номера на седмицата в месеца спрямо тази дата
     data.forEach((item) => {
         const itemDate = new Date(item.date);
         const weekNumber = Math.ceil(itemDate.getDate() / 7);
@@ -34,6 +36,8 @@ export default function CustomBarChart({ data, month, year }: CustomBarChartProp
 
     const categories = Array.from(new Set(data.map((item) => item.category)));
 
+    // изчислява се общата цена за всяка седмица, принадлежаща на 
+    // категорията, и се създава масив от обекти SeriesData.
     const seriesData: SeriesData[] = categories.map((category) => {
         const prices = Array.from({ length: 5 }, (_, index) => {
             const weekData = weeksInMonth[`Week ${index + 1}`] || [];

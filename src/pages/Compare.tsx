@@ -23,9 +23,12 @@ const ComparisonPage: React.FC = () => {
 
     const handleApplyFilters = async () => {
         setIsFiltersApplied(true);
-        if (userId && selectedMonth1 !== null && selectedMonth2 !== null && selectedCategory !== null && year1 !== null && year2 !== null) {
+        // проверка за нулеви променливи
+        if (userId && selectedMonth1 !== null && selectedMonth2 !== null 
+            && selectedCategory !== null && year1 !== null && year2 !== null) {
             const transactionApi = new TransactionApi();
-            try {
+            try {  
+                // извличане на данните за двата месеца
                 const transactions1 = await transactionApi.getCategories(selectedMonth1, year1, selectedCategory, userId);
                 const transactions2 = await transactionApi.getCategories(selectedMonth2, year2, selectedCategory, userId);
                 setData1(transactions1);
@@ -45,7 +48,7 @@ const ComparisonPage: React.FC = () => {
             <div style={{ marginBottom: '5px'}}>
                 <MenuAppBar userId={userId !== undefined ? userId : null} />
 			</div>
-            <Paper elevation={1} style={{ padding: '10px', width: '85%', maxWidth: '1920px', marginLeft: '0', flex: '1', overflow: 'auto' }}>
+            <Paper elevation={1} style={{ padding: '10px', width: '100%', maxWidth: '1920px', marginLeft: '0', flex: '1', overflow: 'auto' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' , marginBottom: '10px'}}>
                     <div>
                         <LocalizationProvider dateAdapter={AdapterDayjs}>

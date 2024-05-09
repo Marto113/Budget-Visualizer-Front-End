@@ -54,8 +54,6 @@ export default function CustomLineChart({ data, max, month }: CustomLineChartPro
             }
         }
 
-        console.log(seriesData);
-
         const options: Highcharts.Options = {
             title: {
                 text: 'Spendings:',
@@ -109,5 +107,5 @@ export default function CustomLineChart({ data, max, month }: CustomLineChartPro
         Highcharts.chart('container', options);
     }, [data, max, month]); 
 
-    return <div id="container" style={{ width: '100%', height: '700px' }} />;
+    return <div id="container" style={{ width: '100%', height: '81vh' }} />;
 }

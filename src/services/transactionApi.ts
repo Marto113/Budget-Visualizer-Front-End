@@ -43,9 +43,11 @@ class TransactionApi {
             });
 
             if (response.status === 200) {
+                console.log('transaction added successfully')
                 return response;
             }
         } catch (error) {
+            console.log('erro adding transaction');
             throw error;
         }
     }
@@ -134,7 +136,6 @@ class TransactionApi {
             const response = await axios.delete(`${this.baseUrl}/transactions`, {
                 params: { id }
             });
-            console.log(response);
             if(response.status === 200){
                 return response.data;
             }

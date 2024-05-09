@@ -24,8 +24,6 @@ const Login = ({ authApi }: { authApi: typeof AuthApi }) => {
         event.preventDefault();
         try {
             const id = await authApi.login(username, password);
-            console.log('Successfully logged in:', id);
-            console.log(id);
             navigate(`/dashboard/${id}`);
 
         } catch (error) {

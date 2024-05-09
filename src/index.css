@@ -1,9 +1,63 @@
-* {
+body, html {
     margin: 0;
     padding: 0;
+    height: 100%;
 }
 
-code {
-    font-family: 'Roboto',
-        monospace;
+.app-bar {
+    margin-bottom: 5px;
+}
+
+.main-content {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+}
+
+.chart-container {
+    width: 70%;
+}
+
+.date-picker-container {
+    margin-bottom: 20px;
+}
+
+.chart-buttons {
+    margin-bottom: 20px;
+}
+
+.chart-wrapper {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.sidebar {
+    width: 30%;
+}
+
+.budget, .form {
+    flex: 1;
+}
+
+.transaction-history {
+    margin-top: 20px;
+}
+
+.transaction-history, .form, .budget {
+    width: 100%;
+}
+
+@media (max-width: 900px) {
+    .main-content {
+        flex-direction: column;
+    }
+
+    .chart-container {
+        width: 100%;
+    }
+
+    .sidebar {
+        width: 100%;
+    }
 }

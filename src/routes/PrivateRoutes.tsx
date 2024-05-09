@@ -26,7 +26,6 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ element }) => {
                     try {
                         const renewToken = await AuthApi.refreshToken();
                         const decodedToken = AuthApi.decodeToken(renewToken);
-                        console.log(decodedToken);
 
                         if (decodedToken && decodedToken.userId) {
                             const userId = decodedToken.userId;

@@ -103,9 +103,12 @@ export default function TransactionHistoryAll() {
                 </Card>
             ))}
             {transactions.length > 3 && !showAllTransactions && (
-                <Button type="submit" variant="contained" onClick={handleViewMore} sx={{ marginLeft: '15px', width: '90%', }}>
-                    View More
-                </Button>
+                <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                    <Button type="submit" variant="contained" onClick={handleViewMore} sx={{ width: '50%' }}>
+                        View More
+                    </Button>
+                </Box>
+            
             )}
         </div>
     );
