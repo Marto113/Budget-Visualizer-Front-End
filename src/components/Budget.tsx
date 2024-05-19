@@ -25,6 +25,7 @@ const Budget: React.FC = () => {
             if (userId) {
                 const transactionApi = new TransactionApi();
                 const balanceData = await transactionApi.getBalance(userId);
+                console.log(userId);
                 if (balanceData) {
                     setSavings(balanceData[0].savings);
                     setIncome(balanceData[0].income);
@@ -93,7 +94,7 @@ const Budget: React.FC = () => {
             </Card>
             <Dialog open={editMode} onClose={handleFormClose}>
                 <DialogTitle>Edit Budget</DialogTitle>
-                <DialogContent sx={{ '& > *': { marginBottom: '0.5rem', marginTop: '0.5rem' } }}>                    
+                <DialogContent sx={{ '& > *': { marginBottom: '10px', marginTop: '10px' } }}>                    
                 <TextField
                         label="Budget"
                         type="number"

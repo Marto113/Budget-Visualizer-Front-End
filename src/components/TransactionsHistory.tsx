@@ -46,10 +46,6 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ selectedDate, s
         fetchData();
     }, [selectedDate, userId]);
 
-    const handleEdit = (transactionId: number) => {
-        // Handle edit action
-    };
-
     const handleDelete = async (transactionId: number) => {
         try {
             const transactionApi = new TransactionApi();
@@ -110,9 +106,6 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ selectedDate, s
                                         {transaction.price} lv
                                     </Typography>
                                     <div>
-                                        <IconButton onClick={() => handleEdit(transaction.userId)} aria-label="edit">
-                                            <EditIcon />
-                                        </IconButton>
                                         <IconButton onClick={() => handleDelete(transaction.id)} aria-label="delete">
                                             <DeleteIcon />
                                         </IconButton>

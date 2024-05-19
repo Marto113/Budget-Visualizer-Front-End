@@ -31,7 +31,7 @@ class AuthApi implements AuthApiInterface {
 
     async register(username: string, password: string): Promise<void> {
         try {
-            const response = await axios.post(`${this.baseUrl}/user/register`, {
+            const response = await axios.post(`${this.baseUrl}/auth/register`, {
                 username,
                 password,
             });

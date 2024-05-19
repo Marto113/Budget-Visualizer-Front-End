@@ -23,12 +23,10 @@ const ComparisonPage: React.FC = () => {
 
     const handleApplyFilters = async () => {
         setIsFiltersApplied(true);
-        // проверка за нулеви променливи
         if (userId && selectedMonth1 !== null && selectedMonth2 !== null 
             && selectedCategory !== null && year1 !== null && year2 !== null) {
             const transactionApi = new TransactionApi();
             try {  
-                // извличане на данните за двата месеца
                 const transactions1 = await transactionApi.getCategories(selectedMonth1, year1, selectedCategory, userId);
                 const transactions2 = await transactionApi.getCategories(selectedMonth2, year2, selectedCategory, userId);
                 setData1(transactions1);
@@ -49,61 +47,58 @@ const ComparisonPage: React.FC = () => {
                 <MenuAppBar userId={userId !== undefined ? userId : null} />
 			</div>
             <Paper elevation={1} style={{ padding: '10px', width: '100%', maxWidth: '1920px', marginLeft: '0', flex: '1', overflow: 'auto' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' , marginBottom: '10px'}}>
-                    <div>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <div style={{ display: 'flex', alignItems: 'center'}}>
-                                <Typography variant="h6" sx={{ marginRight: '10px' }}>Select Month 1:</Typography>
-                                <DatePicker
-                                    label={''}
-                                    openTo="year"
-                                    views={['year', 'month']}
-                                    value={selectedMonth1 !== null ? dayjs().month(selectedMonth1 - 1) : null}
-                                    onChange={(date: Dayjs | null) => {
-                                        setSelectedMonth1(date!.month() + 1);
-                                        setYear1(date!.year());
-                                    }}
-                                />
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', marginTop: '10px'}}>
-                                <Typography variant="h6" sx={{ marginRight: '10px' }}>Select Month 2:</Typography>
-                                <DatePicker
-                                    label={''}
-                                    openTo="year"
-                                    views={['year', 'month']}
-                                    value={selectedMonth2 !== null ? dayjs().month(selectedMonth2 - 1) : null}
-                                    onChange={(date: Dayjs | null) => {
-                                        setSelectedMonth2(date!.month() + 1);
-                                        setYear2(date!.year());
-                                    }}
-                                />
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', marginTop: '10px'}}>
-                                <FormControl sx={{ minWidth: 120 }}>
-                                    <InputLabel id="category-select-label">Category</InputLabel>
-                                    <Select
-                                        labelId="category-select-label"
-                                        id="category-select"
-                                        value={selectedCategory || ''}
-                                        onChange={handleCategoryChange}
-                                    >
-                                        <MenuItem value="">None</MenuItem>
-                                        <MenuItem value="Entertainment">Entertainment</MenuItem>
-                                        <MenuItem value="Groceries">Groceries</MenuItem>
-                                        <MenuItem value="Bills">Bills</MenuItem>
-                                        <MenuItem value="Transportation">Transportation</MenuItem>
-                                        <MenuItem value="Utilities">Utilities</MenuItem>
-                                        <MenuItem value="Food">Food</MenuItem>
-                                        <MenuItem value="Health">Health</MenuItem>
-                                        <MenuItem value="Clothing">Clothing</MenuItem>
-                                        <MenuItem value="Travel">Travel</MenuItem>
-                                        <MenuItem value="Miscellaneous">Miscellaneous</MenuItem>
-                                    </Select>
-                                </FormControl>
-                            </div>
-                        </LocalizationProvider>
-                    </div>
-                    <Button variant="contained" onClick={handleApplyFilters}>Apply Filters</Button>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' , marginBottom: '20px', marginTop: '10px'}}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <div style={{ display: 'flex'}}>
+                            <DatePicker
+                                label={'Month 1'}
+                                openTo="year"
+                                views={['year', 'month']}
+                                value={selectedMonth1 !== null ? dayjs().month(selectedMonth1 - 1) : null}
+                                onChange={(date: Dayjs | null) => {
+                                    setSelectedMonth1(date!.month() + 1);
+                                    setYear1(date!.year());
+                                }}
+                                sx={{
+                                    marginRight: '10px' 
+                                }}
+                            />
+                            <DatePicker
+                                label={'Month 2'}
+                                openTo="year"
+                                views={['year', 'month']}
+                                value={selectedMonth2 !== null ? dayjs().month(selectedMonth2 - 1) : null}
+                                onChange={(date: Dayjs | null) => {
+                                    setSelectedMonth2(date!.month() + 1);
+                                    setYear2(date!.year());
+                                }}
+                                sx={{
+                                    marginRight: '10px' 
+                                }}
+                            />
+                            <FormControl sx={{ minWidth: 120, marginRight: '10px' }}>
+                                <Select
+                                    labelId="category-select-label"
+                                    id="category-select"
+                                    value={selectedCategory || ''}
+                                    onChange={handleCategoryChange}
+                                >
+                                    <MenuItem value="">None</MenuItem>
+                                    <MenuItem value="Entertainment">Entertainment</MenuItem>
+                                    <MenuItem value="Groceries">Groceries</MenuItem>
+                                    <MenuItem value="Bills">Bills</MenuItem>
+                                    <MenuItem value="Transportation">Transportation</MenuItem>
+                                    <MenuItem value="Utilities">Utilities</MenuItem>
+                                    <MenuItem value="Food">Food</MenuItem>
+                                    <MenuItem value="Health">Health</MenuItem>
+                                    <MenuItem value="Clothing">Clothing</MenuItem>
+                                    <MenuItem value="Travel">Travel</MenuItem>
+                                    <MenuItem value="Miscellaneous">Miscellaneous</MenuItem>
+                                </Select>
+                            </FormControl>
+                            <Button variant="contained" onClick={handleApplyFilters}>Apply Filters</Button>
+                        </div>
+                    </LocalizationProvider>
                 </div>
                 <div style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '20px', height: '70%' }}>
                     {isFiltersApplied && selectedMonth1 !== null && selectedMonth2 !== null ? (

@@ -34,33 +34,42 @@ class TransactionApi {
 
     async addTransaction(userId: number, category: string, price: number, name?: string, description?: string): Promise<any> {
         try {
-            const response = await axios.post(`${this.baseUrl}/transactions`, {
+            const payload: { userId: number; category: string; price: number; name?: string; description?: string; } = {
                 userId,
                 category,
                 price,
-                name,
-                description
-            });
-
+            };
+    
+            if (name !== undefined) {
+                payload.name = name;
+            }
+            if (description !== undefined) {
+                payload.description = description;
+            }
+    
+            const response = await axios.post(`${this.baseUrl}/transactions`, payload);
+    
             if (response.status === 200) {
-                console.log('transaction added successfully')
+                console.log('Transaction added successfully');
                 return response;
             }
         } catch (error) {
-            console.log('erro adding transaction');
+            console.log('Error adding transaction:', error);
             throw error;
         }
     }
-
+    
 
     async updateBalance(userId: number, budget: number, savings: number, income: number): Promise<void> {
         try {
-            const response = await axios.put(`${this.baseUrl}/balance`, {
+            const response = await axios.put(`${this.baseUrl}/user/balance`, {
                 userId,
                 budget,
                 savings,
                 income
             });
+
+            console.log(response);
 
             if (response.status !== 200) {
                 throw new Error('Failed to update balance');
@@ -81,6 +90,7 @@ class TransactionApi {
                 return response.data.transactions;
             }
         } catch (error) {
+            console.log("Get transactions error");
             throw error;
         }
     }
@@ -92,6 +102,7 @@ class TransactionApi {
             if (response.status === 200) {
                 return response.data.transactions as Transaction[];
             } else {
+                console.log("Transactions for month error");
                 throw new Error('Unexpected status code: ' + response.status);
             }
         } catch (error) {
@@ -104,8 +115,9 @@ class TransactionApi {
             const response: AxiosResponse<any> = await axios.get(`http://localhost:5000/transactions/category?userId=${userId}&month=${month}`);
     
             if (response.status === 200) {
-                return response.data as TransactionData[];
+                return response.data.categories as TransactionData[];
             } else {
+                console.log("Transactions category error");
                 throw new Error('Unexpected status code: ' + response.status);
             }
         } catch (error) {
@@ -120,6 +132,7 @@ class TransactionApi {
             if ( response.status === 200 ) {
                 return response.data.transactions;
             } else {
+                console.log("Get categories error");
                 throw new Error('Unxpecrted status code: ' + response.status);
             }
         } catch (error) {
@@ -129,26 +142,27 @@ class TransactionApi {
     
 
     async getBalance(userId: number): Promise<BalanceInterface[]> {
+        console.log(userId);
         try {
-            const response = await axios.get(`${this.baseUrl}/balance`, {
-                params: { userId }
-            });
-
+            const response = await axios.get(`${this.baseUrl}/user/balance?userId=${userId}`, {});
+    
             if (response.status === 200) {
-                return response.data.balance.map((balance: any) => ({
-                    id: balance.id,
-                    savings: balance.savings,
-                    income: balance.income,
-                    budget: balance.budget,
-                    userId: balance.userId,
-                }));
+                const balanceData = response.data; 
+                return [{
+                    id: balanceData.id,
+                    savings: balanceData.savings,
+                    income: balanceData.income,
+                    budget: balanceData.budget,
+                    userId: balanceData.userId,
+                }];
             }
         } catch (error) {
             throw error;
         }
-
+    
         return [];
     }
+    
 
     async deleteTransaction(id: number) {
         try {

@@ -18,7 +18,9 @@ const MenuAppBar: React.FC<MenuAppBarProps> = ({ userId }) => {
     const navigate = useNavigate();
 
     const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
+        if (userId) {
+            setAnchorEl(event.currentTarget);
+        }
     };
 
     const handleClose = () => {
@@ -26,11 +28,6 @@ const MenuAppBar: React.FC<MenuAppBarProps> = ({ userId }) => {
         document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         navigate('/login');
         setAnchorEl(null);
-    };
-
-    const handleNavigate = (path: string) => {
-        navigate(path);
-        handleClose();
     };
 
     return (
@@ -41,15 +38,15 @@ const MenuAppBar: React.FC<MenuAppBarProps> = ({ userId }) => {
                         {userId && (
                             <>
                                 <Typography variant="h6" component="div" sx={{ margin: '10px' }} 
-                                            onClick={() => handleNavigate(`/dashboard/${userId}`)}>
+                                            onClick={() => navigate(`/dashboard/${userId}`)}>
                                     Dashboard
                                 </Typography>
                                 <Typography variant="h6" component="div" sx={{ margin: '10px' }} 
-                                            onClick={() => handleNavigate(`/transactions/${userId}`)}>
+                                            onClick={() => navigate(`/transactions/${userId}`)}>
                                     History
                                 </Typography>
                                 <Typography variant="h6" component="div" sx={{ margin: '10px' }} 
-                                            onClick={() => handleNavigate(`/compare/${userId}`)}>
+                                            onClick={() => navigate(`/compare/${userId}`)}>
                                     Compare
                                 </Typography>
                             </>

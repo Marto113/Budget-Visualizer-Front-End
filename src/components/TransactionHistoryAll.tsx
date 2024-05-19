@@ -104,7 +104,7 @@ export default function TransactionHistoryAll() {
             ))}
             {transactions.length > 3 && !showAllTransactions && (
                 <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                    <Button type="submit" variant="contained" onClick={handleViewMore} sx={{ width: '50%' }}>
+                    <Button type="submit" variant="contained" onClick={handleViewMore} sx={{ width: '20%', marginBottom: '20px' }}>
                         View More
                     </Button>
                 </Box>
