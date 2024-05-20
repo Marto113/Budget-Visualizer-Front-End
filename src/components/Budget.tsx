@@ -25,7 +25,6 @@ const Budget: React.FC = () => {
             if (userId) {
                 const transactionApi = new TransactionApi();
                 const balanceData = await transactionApi.getBalance(userId);
-                console.log(userId);
                 if (balanceData) {
                     setSavings(balanceData[0].savings);
                     setIncome(balanceData[0].income);
@@ -101,6 +100,10 @@ const Budget: React.FC = () => {
                         fullWidth
                         value={editedBudget}
                         onChange={(e) => setEditedBudget(parseFloat(e.target.value))}
+                        sx={{
+                            marginTop: '5px',
+                            marginBottom: '10px'
+                        }}
                     />
                     <TextField
                         label="Savings"
@@ -108,6 +111,9 @@ const Budget: React.FC = () => {
                         fullWidth
                         value={editedSavings}
                         onChange={(e) => setEditedSavings(parseFloat(e.target.value))}
+                        sx={{
+                            marginBottom: '10px'
+                        }}
                     />
                     <TextField
                         label="Income"
@@ -115,6 +121,9 @@ const Budget: React.FC = () => {
                         fullWidth
                         value={editedIncome}
                         onChange={(e) => setEditedIncome(parseFloat(e.target.value))}
+                        sx={{
+                            marginBottom: '10px'
+                        }}
                     />
                 </DialogContent>
                 <DialogActions>

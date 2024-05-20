@@ -10,7 +10,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import AuthApi from '../services/authApi'; // Import your AuthApi
+import AuthApi from '../services/authApi';
 import { useNavigate } from 'react-router-dom';
 
 const theme = createTheme();
@@ -25,8 +25,6 @@ const Register: React.FC = () => {
 		event.preventDefault();
 		try {
 			const response = await AuthApi.register(username, password);
-			// Handle successful registration here, e.g., redirect to another page
-			console.log('Registration successful:', response);
 			navigate(`/dashboard/${response}`);
 		} catch (error: any) {
 			if (error.response.status === 409) {

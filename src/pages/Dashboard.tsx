@@ -56,7 +56,6 @@ const Dashboard: React.FC = () => {
             try {
                 const categoryData = await transactionApi.getTransactionsCategory(selectedMonth, userId);
                 if (categoryData !== undefined) {
-                    console.log(categoryData);
                     setTransactionsCategory(categoryData);
                 } else {
                     console.error('Category data undefined');

@@ -23,8 +23,7 @@ interface SeriesData {
 export default function CustomBarChart({ data, month, year }: CustomBarChartProps) {
     const weeksInMonth: { [key: string]: DataItem[] } = {};
 
-    // за всеки елемент се извлича датата му
-    // изчислява се номера на седмицата в месеца спрямо тази дата
+
     data.forEach((item) => {
         const itemDate = new Date(item.date);
         const weekNumber = Math.ceil(itemDate.getDate() / 7);

@@ -50,11 +50,9 @@ class TransactionApi {
             const response = await axios.post(`${this.baseUrl}/transactions`, payload);
     
             if (response.status === 200) {
-                console.log('Transaction added successfully');
                 return response;
             }
         } catch (error) {
-            console.log('Error adding transaction:', error);
             throw error;
         }
     }
@@ -68,8 +66,6 @@ class TransactionApi {
                 savings,
                 income
             });
-
-            console.log(response);
 
             if (response.status !== 200) {
                 throw new Error('Failed to update balance');
@@ -90,7 +86,6 @@ class TransactionApi {
                 return response.data.transactions;
             }
         } catch (error) {
-            console.log("Get transactions error");
             throw error;
         }
     }
@@ -102,7 +97,6 @@ class TransactionApi {
             if (response.status === 200) {
                 return response.data.transactions as Transaction[];
             } else {
-                console.log("Transactions for month error");
                 throw new Error('Unexpected status code: ' + response.status);
             }
         } catch (error) {
@@ -117,7 +111,6 @@ class TransactionApi {
             if (response.status === 200) {
                 return response.data.categories as TransactionData[];
             } else {
-                console.log("Transactions category error");
                 throw new Error('Unexpected status code: ' + response.status);
             }
         } catch (error) {
@@ -132,7 +125,6 @@ class TransactionApi {
             if ( response.status === 200 ) {
                 return response.data.transactions;
             } else {
-                console.log("Get categories error");
                 throw new Error('Unxpecrted status code: ' + response.status);
             }
         } catch (error) {
@@ -142,7 +134,6 @@ class TransactionApi {
     
 
     async getBalance(userId: number): Promise<BalanceInterface[]> {
-        console.log(userId);
         try {
             const response = await axios.get(`${this.baseUrl}/user/balance?userId=${userId}`, {});
     
